@@ -45,7 +45,7 @@ jobs:
           git checkout $(cat ../latest.txt)
           make
           cd ..
-          zip -j iasl.zip acpica/generate/unix/bin/iasl
+          zip -j iasl.zip acpica/generate/unix/bin/*
 
       - name: Bump version and push tag
         if: steps.compare.outputs.changed == 'true'
