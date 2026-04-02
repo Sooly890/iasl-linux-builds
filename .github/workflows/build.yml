@@ -1,0 +1,62 @@
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get latest commit SHA
+        id: latest
+        run: |
+          curl -s https://api.github.com/repos/acpica/acpica/commits \
+          | jq -r '.[0].sha' > latest.txt
+
+      - name: Compare with previous SHA
+        id: compare
+        run: |
+          if [ -f last.txt ] && cmp -s latest.txt last.txt; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Save SHA
+        if: steps.compare.outputs.changed == 'true'
+        run: |
+          cp latest.txt last.txt
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add last.txt
+          git commit -m "Update SHA" || exit 0
+          git push
+
+      - name: Build release
+        if: steps.compare.outputs.changed == 'true'
+        run: |
+          git clone https://github.com/acpica/acpica.git
+          cd acpica
+          git checkout $(cat ../latest.txt)
+          make
+          cd ..
+          zip -j iasl.zip acpica/generate/unix/bin/iasl
+
+      - name: Bump version and push tag
+        if: steps.compare.outputs.changed == 'true'
+        id: tag
+        uses: anothrNick/github-tag-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
+        if: steps.compare.outputs.changed == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.new_tag }}
+          files: iasl.zip
