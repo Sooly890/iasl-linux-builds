@@ -15,8 +15,8 @@ jobs:
       - name: Get latest commit SHA
         id: latest
         run: |
-          curl -s https://api.github.com/repos/acpica/acpica/commits \
-          | jq -r '.[0].sha' > latest.txt
+          curl -s https://api.github.com/repos/acpica/acpica/commits/main \
+          | jq -r '.sha' > latest.txt
 
       - name: Compare with previous SHA
         id: compare
