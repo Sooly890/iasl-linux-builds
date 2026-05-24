@@ -20,10 +20,10 @@ jobs:
       - name: Ensure latest.txt is valid
         id: check
         run: |
-          SHA=$(cat latest.txt) \
-          if [ -z "$SHA" ] || [ "$SHA" = "null" ]; then \
-            echo "Failed to fetch valid SHA" \
-            exit 1 \
+          SHA=$(cat latest.txt)
+          if [ -z "$SHA" ] || [ "$SHA" = "null" ]; then
+            echo "Failed to fetch valid SHA"
+            exit 1
           fi
         
       - name: Compare with previous SHA
