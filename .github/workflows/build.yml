@@ -29,10 +29,10 @@ jobs:
       - name: Compare with previous SHA
         id: compare
         run: |
-          if [ -f last.txt ] && cmp -s latest.txt last.txt; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-          else
-            echo "changed=true" >> $GITHUB_OUTPUT
+          SHA=$(cat latest.txt)
+          if [ -z "$SHA" ] || [ "$SHA" = "null" ]; then
+            echo "Failed to fetch valid SHA"
+            exit 1
           fi
 
       - name: Save SHA
