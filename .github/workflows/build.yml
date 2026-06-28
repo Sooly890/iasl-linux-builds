@@ -42,8 +42,8 @@ jobs:
           LAST_SHA=$(cat last.txt)
           LATEST_SHA=$(cat latest.txt)
           cd acpica
-          SUMMARY_RELEASE_OUTPUT=$(git log ${LAST_SHA}..${LATEST_SHA} --oneline)
-          DETAILED_RELEASE_OUTPUT=$(git log ${LAST_SHA}..${LATEST_SHA})
+          SUMMARY_RELEASE_OUTPUT=$(git --no-pager log ${LAST_SHA}..${LATEST_SHA} --oneline)
+          DETAILED_RELEASE_OUTPUT=$(git --no-pager log ${LAST_SHA}..${LATEST_SHA})
           echo "${SUMMARY_RELEASE_OUTPUT}" > ../release_output.txt
           echo "<details><summary>details</summary>" >> ../release_output.txt
           echo "${DETAILED_SUMMARY_OUTPUT}" >> ../release_output.txt
